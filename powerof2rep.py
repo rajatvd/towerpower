@@ -47,6 +47,9 @@ def p2rep(tower):
         lli = l2(l2(tower[0]))
 
 
+EPS = Decimal(1e-48)
+
+
 # %%
 def cmp_height_4(a, b):
     assert len(a) == 4, "a must be a height 4 tower"
@@ -58,6 +61,8 @@ def cmp_height_4(a, b):
     shouldbe3, b_rep = p2rep(b)
     assert shouldbe3 == 3, "p2rep(b) must return height of 3"
 
+    if abs(a_rep - b_rep) / (abs(a_rep)) < EPS:
+        return 0
     if a_rep < b_rep:
         return -1
     if a_rep > b_rep:
@@ -77,6 +82,8 @@ def cmp_height_3(a, b):
     shouldbe2, b_rep = p2rep(b)
     assert shouldbe2 == 2, "p2rep(b) must return height of 2"
 
+    if abs(a_rep - b_rep) / (abs(a_rep)) < EPS:
+        return 0
     if a_rep < b_rep:
         return -1
     if a_rep > b_rep:
@@ -84,6 +91,11 @@ def cmp_height_3(a, b):
 
     return 0
 
+
+# %%
+t1 = (16, 16, 10)
+t2 = (2, 2, 42)
+cmp_height_3(tuple(Decimal(x) for x in t1), tuple(Decimal(x) for x in t2))
 
 # %%
 t1 = (5, 4, 7, 71)
@@ -150,7 +162,7 @@ def compute_height3_ratio(a, b):
         if result == 0:
             return (i, j, lij)
         if result < 0:
-            print("WOW")
+            # print("WOW")
             hi = mid
         else:
             lo = mid + 1
@@ -161,25 +173,31 @@ def compute_height3_ratio(a, b):
 
 
 # %%
+count = 1
 for i in tqdm(list(range(len(HEIGHT3) - 1))[::-1][800000:]):
     j = i + 1
     a = HEIGHT3[i]
     b = HEIGHT3[j]
     ratio = compute_height3_ratio(a, b)
     if len(ratio) == 1:
-        print(f"{a} {b}")
         continue
     if ratio[2] < PAIRWISE_LOGS[-1][2]:
         if a[0] == b[0]:
             continue
-        print(f"{a} {b}")
-        print(f"{ratio}")
-        print("nihilism is false")
-        break
+        sa = tuple(str(Decimal(x)) for x in a)
+        sb = tuple(str(Decimal(x)) for x in b)
+        ri = ratio[0]
+        rj = ratio[1]
+        print(f"{sa} {sb}, {rj} {ri}")
+        count -= 1
+        if count == 0:
+            break
+        # print(f"{ratio}")
+        # break
 
 
 # %%
-sa = tuple(str(Decimal(x)) for x in a)
-sb = tuple(str(Decimal(x)) for x in b)
 print(sa, sb, cmp_height_3(a, b))
-print((100, *sa), (99, *sb), cmp_height_4((Decimal(100), *a), (Decimal(99), *b)))
+print((str(rj), *sa), (str(ri), *sb), cmp_height_4((rj, *a), (ri, *b)))
+print((str(rj - 1), *sa), (str(ri), *sb), cmp_height_4((rj - 1, *a), (ri, *b)))
+print((str(rj), *sa), (str(ri + 1), *sb), cmp_height_4((rj, *a), (ri + 1, *b)))
